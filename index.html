@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Tienda Online</title>
+
 <style>
 body{
 font-family: Arial;
@@ -55,6 +56,7 @@ input{
 width:60px;
 text-align:center;
 }
+
 .total{
 margin-top:20px;
 font-size:18px;
@@ -76,22 +78,24 @@ Total: S/ <span id="total">0</span>
 
 <script>
 
-const whatsapp = "51992044102"; // TU NUMERO
+const whatsapp = "51992044102";
 
-const csvURL = "PEGA_AQUI_TU_LINK_CSV";
+const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8uMFvOEq09EXVbg6YxPa1lhGndcrwD-ELRkxRQVsiG4Tjb646vPzGPcuHP4CD_EZ-F7da5BonXwt3/pub?output=csv";
 
 let carrito = [];
 let total = 0;
 
 fetch(csvURL)
-.then(res => res.text())
+.then(response => response.text())
 .then(data => {
-const filas = data.split("\n").slice(1);
 
-filas.forEach(fila=>{
-if(!fila) return;
+const filas = data.trim().split("\n").slice(1);
+
+filas.forEach(fila => {
 
 const columnas = fila.split(",");
+
+if(columnas.length < 6) return;
 
 const nombre = columnas[0];
 const marca = columnas[1];
@@ -105,7 +109,7 @@ const contenedor = document.getElementById("productos");
 const card = document.createElement("div");
 card.className="card";
 
-card.innerHTML=`
+card.innerHTML = `
 <img src="${imagen}" alt="">
 <h3>${nombre}</h3>
 <p><b>Marca:</b> ${marca}</p>
@@ -120,15 +124,17 @@ Agregar
 contenedor.appendChild(card);
 
 });
+
 });
 
 function agregar(nombre,precioU,precioM,minM){
 
 const cantidad = parseInt(document.getElementById("cant-"+nombre).value);
-if(cantidad<=0) return;
 
-let precioFinal = cantidad>=minM ? precioM : precioU;
-let subtotal = cantidad*precioFinal;
+if(!cantidad || cantidad<=0) return;
+
+let precioFinal = cantidad >= minM ? precioM : precioU;
+let subtotal = cantidad * precioFinal;
 
 carrito.push({nombre,cantidad,subtotal});
 total += subtotal;
