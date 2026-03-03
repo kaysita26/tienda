@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tienda Escolar Profesional</title>
+
+<style>
+body{font-family:Arial;background:#f2f2f2;padding:20px}
+h1{text-align:center;}
+.producto{
+    background:white;
+    padding:15px;
+    margin-bottom:15px;
+    border-radius:10px;
+    display:flex;
+    gap:15px;
+    align-items:center;
+}
+.producto img{
+    width:90px;
+    height:90px;
+    object-fit:cover;
+    border-radius:8px;
+}
+button{
+    background:#25D366;
+    color:white;
+    padding:12px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:16px;
+}
+input[type="number"]{
+    width:60px;
+}
+.total-box{
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+    font-size:20px;
+    margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Tienda Escolar</h1>
+
+<label>Nombre:</label><br>
+<input type="text" id="nombre"><br><br>
+
+<label>Teléfono:</label><br>
+<input type="text" id="telefono"><br><br>
+
+<div id="listaProductos"></div>
+
+<div class="total-box">
+Total: S/ <span id="total">0.00</span><br><br>
+<button onclick="enviar()">Enviar Pedido por WhatsApp</button>
+</div>
+
+<script>
+
+// 👇 Aquí va tu enlace CSV (tal como lo proporcionaste)
+const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8uMFvOEq09EXVbg6YxPa1lhGndcrwD-ELRkxRQVsiG4Tjb646vPzGPcuHP4CD_EZ-F7da5BonXwt3/pub?output=csv";
+
+let productos = [];
+
+fetch(url)
+.then(response => response.text())
+.then(data => {
+    const filas = data.trim().split("\n");
+    
+    // saltar encabezado
+    for(let i = 1; i < filas.length; i++){
+        const columnas = filas[i].split(",");
+
+        if(columnas.length >= 5){
+            productos.push({
+                nombre: columnas[0],
+                unidad: parseFloat(columnas[1]) || 0,
+                mayor: parseFloat(columnas[2]) || 0,
+                minMayor: parseInt(columnas[3]) || 0,
+                imagen: columnas[4]
+            });
+        }
+    }
+
+    cargarProductos();
+})
+.catch(error => {
+    alert("Error cargando productos. Asegúrate de que el enlace CSV esté publicado.");
+    console.log(error);
+});
+
+function cargarProductos(){
+    let contenedor = document.getElementById("listaProductos");
+    contenedor.innerHTML = "";
+
+    productos.forEach((p,i)=>{
+        contenedor.innerHTML += `
+        <div class="producto">
+            <img src="${p.imagen}" onerror="this.src='https://via.placeholder.com/90'">
+            <div>
+                <h3>${p.nombre}</h3>
+                <p>Unidad: S/${p.unidad.toFixed(2)}</p>
+                <p>Desde ${p.minMayor} unidades: S/${p.mayor.toFixed(2)}</p>
+                Cantidad:
+                <input type="number" min="0" value="0" onchange="calcular()" id="prod${i}">
+            </div>
+        </div>
+        `;
+    });
+}
+
+function calcular(){
+    let total = 0;
+
+    productos.forEach((p,i)=>{
+        let cantidad = parseInt(document.getElementById("prod"+i).value) || 0;
+        let precio = cantidad >= p.minMayor ? p.mayor : p.unidad;
+        total += cantidad * precio;
+    });
+
+    document.getElementById("total").innerText = total.toFixed(2);
+}
+
+function enviar(){
+    let nombre = document.getElementById("nombre").value.trim();
+    let telefono = document.getElementById("telefono").value.trim();
+    let total = document.getElementById("total").innerText;
+
+    if(nombre === "" || telefono === ""){
+        alert("Ingresa nombre y teléfono");
+        return;
+    }
+
+    let mensaje = "🛒 PEDIDO NUEVO%0A";
+    mensaje += "Cliente: " + nombre + "%0A";
+    mensaje += "Teléfono: " + telefono + "%0A%0A";
+
+    productos.forEach((p,i)=>{
+        let cantidad = parseInt(document.getElementById("prod"+i).value) || 0;
+
+        if(cantidad > 0){
+            let precio = cantidad >= p.minMayor ? p.mayor : p.unidad;
+            mensaje += p.nombre + " x" + cantidad + " = S/" + (cantidad*precio).toFixed(2) + "%0A";
+        }
+    });
+
+    mensaje += "%0ATotal: S/" + total;
+
+    let miNumero = "51992044102"; // CAMBIA ESTO SI QUIERES
+    window.open("https://wa.me/" + miNumero + "?text=" + mensaje);
+}
+
+</script>
+
+</body>
+</html>
