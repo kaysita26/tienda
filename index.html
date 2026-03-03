@@ -5,11 +5,9 @@
 <title>Sophie Store</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Fuente profesional juvenil -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-
 body{
 margin:0;
 font-family:'Poppins',sans-serif;
@@ -24,23 +22,22 @@ display:flex;
 align-items:center;
 justify-content:center;
 position:relative;
-padding:15px;
+padding:12px;
 }
 
 header img{
 position:absolute;
 left:15px;
-width:45px;
-height:45px;
+width:40px;
+height:40px;
 border-radius:50%;
 object-fit:cover;
 }
 
 header h1{
 margin:0;
-font-size:28px;
+font-size:24px;
 font-weight:700;
-letter-spacing:2px;
 }
 
 /* FILTROS */
@@ -54,7 +51,7 @@ justify-content:center;
 }
 
 input,select{
-padding:8px;
+padding:6px;
 border-radius:8px;
 border:1px solid #ccc;
 font-family:'Poppins';
@@ -63,15 +60,15 @@ font-family:'Poppins';
 /* PRODUCTOS */
 #productos{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:15px;
-padding:15px;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:12px;
+padding:12px;
 }
 
 .producto{
 background:white;
-border-radius:15px;
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
+border-radius:12px;
+box-shadow:0 3px 8px rgba(0,0,0,0.1);
 overflow:hidden;
 display:flex;
 flex-direction:column;
@@ -79,61 +76,79 @@ flex-direction:column;
 
 .producto img{
 width:100%;
-height:180px;
+height:150px;
 object-fit:contain;
 background:white;
 }
 
 .info{
-padding:10px;
+padding:8px;
 }
 
 .info h3{
-margin:5px 0;
-font-size:18px;
+margin:4px 0;
+font-size:16px;
 }
 
 .categoria{
-font-size:13px;
+font-size:12px;
 color:gray;
 }
 
 .precio{
 font-weight:600;
-margin-top:5px;
+font-size:14px;
+}
+
+.descuento{
+color:red;
+font-size:13px;
+font-weight:600;
+}
+
+.precio-tachado{
+text-decoration:line-through;
+color:gray;
+font-size:13px;
 }
 
 .btn-agregar{
-margin-top:8px;
+margin-top:6px;
 background:#6a0dad;
 color:white;
 border:none;
-padding:8px;
+padding:6px;
 border-radius:8px;
 cursor:pointer;
 width:100%;
+font-size:13px;
 }
 
-/* CELULAR */
+/* CELULAR OPTIMIZADO */
 @media(max-width:600px){
+
+#productos{
+grid-template-columns:1fr;
+}
 
 .producto{
 flex-direction:row;
-height:140px;
+height:120px;
 }
 
 .producto img{
-width:40%;
+width:35%;
 height:100%;
 }
 
 .info{
-width:60%;
-font-size:13px;
+width:65%;
+font-size:12px;
 }
 
-header h1{
-font-size:22px;
+.btn-agregar{
+font-size:12px;
+padding:5px;
 }
 
 }
@@ -141,31 +156,30 @@ font-size:22px;
 /* BOTÓN CARRITO */
 .carrito-btn{
 position:fixed;
-bottom:20px;
-right:20px;
+bottom:15px;
+right:15px;
 background:#25D366;
 color:white;
 border:none;
-padding:15px;
+padding:14px;
 border-radius:50%;
-font-size:22px;
+font-size:20px;
 cursor:pointer;
-box-shadow:0 4px 10px rgba(0,0,0,0.3);
 z-index:1000;
 }
 
-/* PANEL CARRITO */
+/* PANEL */
 .carrito-panel{
 position:fixed;
 right:-100%;
 top:0;
 width:100%;
-max-width:400px;
+max-width:380px;
 height:100%;
 background:white;
 box-shadow:-5px 0 15px rgba(0,0,0,0.2);
 transition:0.4s;
-padding:20px;
+padding:15px;
 overflow-y:auto;
 z-index:2000;
 }
@@ -174,55 +188,37 @@ z-index:2000;
 right:0;
 }
 
-.carrito-panel h2{
-margin-top:0;
-}
-
 .item-carrito{
 border-bottom:1px solid #eee;
-padding:8px 0;
+padding:6px 0;
 display:flex;
 justify-content:space-between;
-align-items:center;
-font-size:14px;
-}
-
-.eliminar{
-background:red;
-color:white;
-border:none;
-border-radius:5px;
-padding:4px 8px;
-cursor:pointer;
-font-size:12px;
+font-size:13px;
 }
 
 .total{
-font-size:20px;
+font-size:18px;
 font-weight:bold;
-margin-top:15px;
+margin-top:10px;
 }
 
 .btn-confirmar{
 background:#25D366;
 color:white;
-padding:10px;
+padding:8px;
 border:none;
-border-radius:10px;
-margin-top:10px;
-cursor:pointer;
+border-radius:8px;
+margin-top:8px;
 width:100%;
-font-size:15px;
 }
 
 .btn-seguir{
 background:#6a0dad;
 color:white;
-padding:8px;
+padding:6px;
 border:none;
 border-radius:8px;
-margin-top:10px;
-cursor:pointer;
+margin-top:6px;
 width:100%;
 }
 
@@ -249,17 +245,13 @@ width:100%;
 <div class="carrito-panel" id="carritoPanel">
 <h2>Tu Pedido</h2>
 <div id="listaCarrito"></div>
-
-<div class="total">
-Total: S/. <span id="total">0.00</span>
-</div>
+<div class="total">Total: S/. <span id="total">0.00</span></div>
 
 <input type="text" id="nombreCliente" placeholder="Tu nombre">
 <input type="tel" id="celCliente" placeholder="Tu celular">
 
 <button class="btn-confirmar" onclick="confirmarPedido()">Confirmar Pedido</button>
 <button class="btn-seguir" onclick="toggleCarrito()">Seguir comprando</button>
-
 </div>
 
 <script>
@@ -273,9 +265,13 @@ fetch(urlCSV)
 .then(res=>res.text())
 .then(data=>{
 let filas=data.split("\n").slice(1);
+
 filas.forEach((fila,index)=>{
 let col=fila.split(",");
-if(col.length>=7){
+
+if(col.length>=8){
+
+let descuento=parseFloat(col[7])||0;
 
 let p={
 nombre:col[0],
@@ -283,23 +279,32 @@ precioUnidad:parseFloat(col[2]),
 precioMayor:parseFloat(col[3]),
 minMayor:parseInt(col[4]),
 imagen:col[5],
-categoria:col[6]
+categoria:col[6],
+descuento:descuento
 };
 
 productos.push(p);
 
-if(!document.getElementById("categoria").innerHTML.includes(p.categoria)){
-document.getElementById("categoria").innerHTML+=`<option>${p.categoria}</option>`;
+let precioFinal=p.precioUnidad;
+if(descuento>0){
+precioFinal=p.precioUnidad-(p.precioUnidad*descuento/100);
 }
 
 document.getElementById("productos").innerHTML+=`
-<div class="producto" data-nombre="${p.nombre.toLowerCase()}" data-cat="${p.categoria}">
+<div class="producto">
 <img src="${p.imagen}">
 <div class="info">
 <h3>${p.nombre}</h3>
 <div class="categoria">${p.categoria}</div>
-<div class="precio">Unidad: S/. ${p.precioUnidad.toFixed(2)}</div>
-<div class="precio">Mayor desde ${p.minMayor}: S/. ${p.precioMayor.toFixed(2)}</div>
+
+${descuento>0?
+`<div class="precio-tachado">S/. ${p.precioUnidad.toFixed(2)}</div>
+<div class="descuento">${descuento}% OFF</div>
+<div class="precio">S/. ${precioFinal.toFixed(2)}</div>`
+:
+`<div class="precio">S/. ${p.precioUnidad.toFixed(2)}</div>`
+}
+
 <input type="number" min="1" value="1" id="cant${index}">
 <button class="btn-agregar" onclick="agregarCarrito(${index})">Agregar al carrito</button>
 </div>
@@ -313,17 +318,17 @@ function agregarCarrito(index){
 let cantidad=parseInt(document.getElementById("cant"+index).value);
 let p=productos[index];
 
-let precio=cantidad>=p.minMayor?p.precioMayor:p.precioUnidad;
-let subtotal=cantidad*precio;
+let precioBase=cantidad>=p.minMayor?p.precioMayor:p.precioUnidad;
 
-carrito.push({
-nombre:p.nombre,
-cantidad:cantidad,
-subtotal:subtotal
-});
+if(p.descuento>0){
+precioBase=precioBase-(precioBase*p.descuento/100);
+}
+
+let subtotal=cantidad*precioBase;
+
+carrito.push({nombre:p.nombre,cantidad,subtotal});
 
 actualizarCarrito();
-alert("Producto agregado al carrito");
 }
 
 function actualizarCarrito(){
@@ -333,20 +338,11 @@ let total=0;
 
 carrito.forEach((p,i)=>{
 total+=p.subtotal;
-lista+=`
-<div class="item-carrito">
-<span>${p.nombre} x${p.cantidad} - S/. ${p.subtotal.toFixed(2)}</span>
-<button class="eliminar" onclick="eliminarItem(${i})">X</button>
-</div>`;
+lista+=`<div class="item-carrito">${p.nombre} x${p.cantidad} - S/. ${p.subtotal.toFixed(2)}</div>`;
 });
 
 document.getElementById("listaCarrito").innerHTML=lista;
 document.getElementById("total").innerText=total.toFixed(2);
-}
-
-function eliminarItem(i){
-carrito.splice(i,1);
-actualizarCarrito();
 }
 
 function toggleCarrito(){
@@ -354,56 +350,34 @@ document.getElementById("carritoPanel").classList.toggle("activo");
 }
 
 function confirmarPedido(){
-
 let nombre=document.getElementById("nombreCliente").value.trim();
 let cel=document.getElementById("celCliente").value.trim();
 
-if(nombre==="" || cel===""){
-alert("Debes ingresar nombre y celular");
+if(nombre===""||cel===""){
+alert("Ingresa nombre y celular");
 return;
 }
 
-if(carrito.length===0){
-alert("Agrega productos primero");
-return;
-}
-
-if(!confirm("¿Confirmas tu pedido?")){
-return;
-}
-
-let mensaje="Hola, soy "+nombre+"%0A";
-mensaje+="Mi número es: "+cel+"%0A%0A";
-mensaje+="Pedido:%0A";
+let mensaje=`Hola soy ${nombre}%0AMi número es ${cel}%0A%0APedido:%0A`;
 
 let total=0;
-
 carrito.forEach(p=>{
 mensaje+=`- ${p.nombre} x${p.cantidad} = S/. ${p.subtotal.toFixed(2)}%0A`;
 total+=p.subtotal;
 });
 
-mensaje+="%0ATotal: S/. "+total.toFixed(2);
+mensaje+=`%0ATotal: S/. ${total.toFixed(2)}`;
 
 window.open("https://wa.me/51992044102?text="+mensaje);
-
 }
 
 function filtrar(){
 let texto=document.getElementById("buscar").value.toLowerCase();
-let categoria=document.getElementById("categoria").value;
 let cards=document.querySelectorAll(".producto");
 
 cards.forEach(card=>{
-let nombre=card.getAttribute("data-nombre");
-let cat=card.getAttribute("data-cat");
-
-let mostrar=true;
-
-if(texto && !nombre.includes(texto)) mostrar=false;
-if(categoria && cat!=categoria) mostrar=false;
-
-card.style.display=mostrar?"block":"none";
+let nombre=card.innerText.toLowerCase();
+card.style.display=nombre.includes(texto)?"flex":"none";
 });
 }
 
