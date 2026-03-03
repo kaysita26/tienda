@@ -2,163 +2,162 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sophie Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+
 body{
-  font-family: Arial;
-  margin:0;
-  background:#f5f5f5;
-  padding-bottom:90px;
+font-family:Arial;
+margin:0;
+background:#f4f4f4;
 }
 
+/* HEADER */
 header{
-  background:#000;
-  color:white;
-  text-align:center;
-  padding:15px;
+background:#6a0dad;
+color:white;
+padding:15px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
 }
 
-header img{
-  height:65px;
+/* FILTROS */
+.filtros{
+padding:10px;
+background:white;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+justify-content:center;
 }
 
-.controles{
-  padding:10px;
-  text-align:center;
+input,select{
+padding:8px;
+border-radius:8px;
+border:1px solid #ccc;
 }
 
-input, select{
-  padding:8px;
-  margin:5px;
-  border-radius:8px;
-  border:1px solid #ccc;
+/* PRODUCTOS */
+#productos{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+gap:15px;
+padding:15px;
 }
 
 .producto{
-  display:flex;
-  background:white;
-  margin:10px;
-  border-radius:12px;
-  padding:10px;
-  box-shadow:0 3px 8px rgba(0,0,0,0.1);
+background:white;
+border-radius:15px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+overflow:hidden;
+transition:0.3s;
+}
+
+.producto:hover{
+transform:scale(1.02);
 }
 
 .producto img{
-  width:110px;
-  height:110px;
-  object-fit:cover;
-  border-radius:10px;
-  margin-right:10px;
+width:100%;
+height:200px;
+object-fit:cover;
 }
 
 .info{
-  flex:1;
+padding:10px;
 }
 
 .info h3{
-  margin:0;
-  font-size:18px;
+margin:5px 0;
+font-size:16px;
 }
 
 .categoria{
-  font-size:12px;
-  color:gray;
+font-size:12px;
+color:gray;
+margin-bottom:5px;
 }
 
-.precio-original{
-  text-decoration:line-through;
-  color:gray;
-  font-size:13px;
+/* CARRITO APP */
+.carrito-app{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+background:white;
+box-shadow:0 -4px 15px rgba(0,0,0,0.2);
+padding:15px;
+display:flex;
+flex-direction:column;
+align-items:center;
+z-index:1000;
 }
 
-.precio-final{
-  color:green;
-  font-weight:bold;
+/* TOTAL CENTRADO */
+.total{
+font-size:20px;
+font-weight:bold;
+margin-bottom:10px;
+text-align:center;
+width:100%;
 }
 
-.descuento{
-  background:red;
-  color:white;
-  padding:3px 6px;
-  border-radius:5px;
-  font-size:12px;
-  display:inline-block;
-  margin-top:3px;
+/* BOTON WHATSAPP */
+.btn-wsp{
+background:#25D366;
+color:white;
+padding:12px 20px;
+border:none;
+border-radius:30px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+display:flex;
+align-items:center;
+gap:10px;
+transition:0.3s;
 }
 
-input[type="number"]{
-  width:60px;
-  margin-top:5px;
+.btn-wsp:hover{
+background:#1ebe5d;
+transform:scale(1.05);
 }
 
-#carritoBarra{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:#25D366;
-  color:white;
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-weight:bold;
-  cursor:pointer;
+.btn-wsp img{
+width:22px;
 }
 
-.modal{
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.6);
-  justify-content:center;
-  align-items:center;
+/* ESPACIO PARA QUE NO TAPE PRODUCTOS */
+.espacio{
+height:120px;
 }
 
-.modal-content{
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  width:90%;
-  max-width:400px;
-}
 </style>
 </head>
-
 <body>
 
-<header>
-  <img src="https://raw.githubusercontent.com/kaysita26/tienda/main/imagenes/LOGO%20SOPHIE%20STORE.jpeg">
-  <h2>SOPHIE STORE</h2>
-</header>
+<header>🛍 Sophie Store</header>
 
-<div class="controles">
-  <input type="text" id="buscador" placeholder="Buscar..." oninput="filtrar()">
-  <select id="filtroCategoria" onchange="filtrar()">
-    <option value="">Todas las categorías</option>
-  </select>
+<div class="filtros">
+<input type="text" id="buscador" placeholder="Buscar producto..." onkeyup="filtrar()">
+<select id="filtroCategoria" onchange="filtrar()">
+<option value="">Todas las categorías</option>
+</select>
 </div>
 
 <div id="productos"></div>
 
-<div id="carritoBarra" onclick="abrirConfirmacion()">
-  🛒 <span id="cantidadItems">0 ítems</span>
-  <span id="totalCarrito">S/. 0.00</span>
-</div>
+<div class="espacio"></div>
 
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <h3>Confirmar Pedido</h3>
-    <div id="resumen"></div>
-    <input type="text" id="nombreCliente" placeholder="Tu nombre">
-    <input type="tel" id="celCliente" placeholder="Tu celular">
-    <button onclick="enviarPedido()">Enviar a WhatsApp</button>
-  </div>
+<!-- CARRITO TIPO APP -->
+<div class="carrito-app">
+<div class="total">Total: S/. <span id="total">0.00</span></div>
+<button class="btn-wsp" onclick="enviarPedido()">
+<img src="https://cdn-icons-png.flaticon.com/512/733/733585.png">
+Confirmar pedido por WhatsApp
+</button>
 </div>
 
 <script>
@@ -173,7 +172,6 @@ fetch(urlCSV)
 .then(data=>{
 
 let filas=data.split("\n").slice(1);
-let categorias=[];
 
 filas.forEach((fila,index)=>{
 
@@ -182,6 +180,7 @@ let col=fila.split(",");
 if(col.length>=9){
 
 let descuento=parseFloat(col[8])||0;
+
 let precioUnidad=parseFloat(col[2]);
 let precioMayor=parseFloat(col[3]);
 
@@ -193,6 +192,8 @@ nombre:col[0],
 marca:col[1],
 precioUnidad:precioUnidadFinal,
 precioMayor:precioMayorFinal,
+precioUnidadOriginal:precioUnidad,
+precioMayorOriginal:precioMayor,
 minMayor:parseInt(col[4]),
 imagen:col[5],
 categoria:col[6],
@@ -202,11 +203,19 @@ descuento:descuento
 
 productos.push(producto);
 
-if(!categorias.includes(producto.categoria)){
-categorias.push(producto.categoria);
+if(!document.getElementById("filtroCategoria").innerHTML.includes(producto.categoria)){
 document.getElementById("filtroCategoria").innerHTML+=
 `<option value="${producto.categoria}">${producto.categoria}</option>`;
 }
+
+let etiquetaDescuento = descuento>0 
+? `<div style="background:red;color:white;padding:3px 6px;border-radius:5px;font-size:12px;display:inline-block;">-${descuento}%</div>`
+: "";
+
+let precioHTML = descuento>0 
+? `<div style="text-decoration:line-through;color:gray;">Unidad: S/. ${precioUnidad.toFixed(2)}</div>
+   <div style="color:green;font-weight:bold;">Ahora: S/. ${precioUnidadFinal.toFixed(2)}</div>`
+: `<div>Unidad: S/. ${precioUnidad.toFixed(2)}</div>`;
 
 document.getElementById("productos").innerHTML+=`
 <div class="producto" data-nombre="${producto.nombre.toLowerCase()}" data-cat="${producto.categoria}">
@@ -214,9 +223,8 @@ document.getElementById("productos").innerHTML+=`
 <div class="info">
 <h3>${producto.nombre}</h3>
 <div class="categoria">${producto.categoria} | Cod: ${producto.codigo}</div>
-${descuento>0?`<div class="descuento">-${descuento}%</div>`:""}
-${descuento>0?`<div class="precio-original">Unidad: S/. ${precioUnidad.toFixed(2)}</div>`:""}
-<div class="precio-final">Unidad: S/. ${precioUnidadFinal.toFixed(2)}</div>
+${etiquetaDescuento}
+${precioHTML}
 <div>Mayor desde ${producto.minMayor}: S/. ${precioMayorFinal.toFixed(2)}</div>
 <input type="number" min="0" value="0" oninput="calcular(${index},this.value)">
 </div>
@@ -227,80 +235,41 @@ ${descuento>0?`<div class="precio-original">Unidad: S/. ${precioUnidad.toFixed(2
 
 });
 
-function filtrar(){
-let texto=document.getElementById("buscador").value.toLowerCase();
-let cat=document.getElementById("filtroCategoria").value;
-
-document.querySelectorAll(".producto").forEach(p=>{
-let nombre=p.dataset.nombre;
-let categoria=p.dataset.cat;
-let mostrar=nombre.includes(texto)&&(cat==""||categoria==cat);
-p.style.display=mostrar?"flex":"none";
-});
-}
-
 function calcular(index,cantidad){
 cantidad=parseInt(cantidad);
 
 if(isNaN(cantidad)||cantidad<=0){
 carrito[index]=null;
-actualizarCarrito();
+actualizarTotal();
 return;
 }
 
 let p=productos[index];
+
 let precio=cantidad>=p.minMayor?p.precioMayor:p.precioUnidad;
 let subtotal=cantidad*precio;
 
-carrito[index]={nombre:p.nombre,codigo:p.codigo,cantidad:cantidad,subtotal:subtotal};
-actualizarCarrito();
+carrito[index]={
+nombre:p.nombre,
+codigo:p.codigo,
+cantidad:cantidad,
+subtotal:subtotal
+};
+
+actualizarTotal();
 }
 
-function actualizarCarrito(){
+function actualizarTotal(){
 let total=0;
-let items=0;
-
 carrito.forEach(p=>{
-if(p){
-total+=p.subtotal;
-items+=p.cantidad;
-}
+if(p){ total+=p.subtotal; }
 });
-
-document.getElementById("cantidadItems").innerText=items+" ítems";
-document.getElementById("totalCarrito").innerText="S/. "+total.toFixed(2);
-}
-
-function abrirConfirmacion(){
-let resumen="";
-let total=0;
-
-carrito.forEach(p=>{
-if(p){
-resumen+=`${p.nombre} (Cod:${p.codigo}) x${p.cantidad} = S/. ${p.subtotal.toFixed(2)}<br>`;
-total+=p.subtotal;
-}
-});
-
-if(total==0){alert("No seleccionaste productos");return;}
-
-resumen+=`<strong>Total: S/. ${total.toFixed(2)}</strong>`;
-document.getElementById("resumen").innerHTML=resumen;
-document.getElementById("modal").style.display="flex";
+document.getElementById("total").innerText=total.toFixed(2);
 }
 
 function enviarPedido(){
 
-let nombre=document.getElementById("nombreCliente").value;
-let cel=document.getElementById("celCliente").value;
-
-if(nombre==""||cel==""){
-alert("Completa nombre y celular");
-return;
-}
-
-let mensaje=`Hola, soy ${nombre}.%0AMi celular: ${cel}%0A%0APedido:%0A`;
-
+let mensaje="Hola, quiero hacer este pedido:%0A%0A";
 let total=0;
 
 carrito.forEach(p=>{
@@ -314,7 +283,26 @@ mensaje+=`%0ATotal: S/. ${total.toFixed(2)}`;
 
 window.open("https://wa.me/51992044102?text="+mensaje);
 
-location.reload();
+}
+
+function filtrar(){
+
+let texto=document.getElementById("buscador").value.toLowerCase();
+let categoria=document.getElementById("filtroCategoria").value;
+
+let cards=document.querySelectorAll(".producto");
+
+cards.forEach(card=>{
+let nombre=card.getAttribute("data-nombre");
+let cat=card.getAttribute("data-cat");
+
+let mostrar=true;
+
+if(texto && !nombre.includes(texto)){ mostrar=false; }
+if(categoria && cat!=categoria){ mostrar=false; }
+
+card.style.display=mostrar?"block":"none";
+});
 
 }
 
