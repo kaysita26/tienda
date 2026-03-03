@@ -14,7 +14,19 @@ padding:20px;
 
 h1{
 text-align:center;
-margin-bottom:30px;
+}
+
+.filtros{
+display:flex;
+gap:10px;
+margin-bottom:20px;
+flex-wrap:wrap;
+}
+
+input, select{
+padding:8px;
+border-radius:5px;
+border:1px solid #ccc;
 }
 
 .productos{
@@ -36,12 +48,6 @@ width:100%;
 height:180px;
 object-fit:cover;
 border-radius:8px;
-}
-
-input{
-width:60px;
-text-align:center;
-margin-top:5px;
 }
 
 button{
@@ -72,6 +78,13 @@ font-weight:bold;
 
 <h1>Mi Tienda Online</h1>
 
+<div class="filtros">
+<input type="text" id="buscador" placeholder="Buscar producto..." onkeyup="filtrar()">
+<select id="filtroMarca" onchange="filtrar()">
+<option value="">Todas las marcas</option>
+</select>
+</div>
+
 <div id="productos" class="productos"></div>
 
 <div class="total">
@@ -83,97 +96,135 @@ Total: S/ <span id="total">0.00</span>
 <script>
 
 const whatsapp = "51992044102";
-
 const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8uMFvOEq09EXVbg6YxPa1lhGndcrwD-ELRkxRQVsiG4Tjb646vPzGPcuHP4CD_EZ-F7da5BonXwt3/pub?output=csv";
 
 let carrito = {};
 let total = 0;
+let productosData = [];
 
 fetch(csvURL)
-.then(response => response.text())
+.then(res => res.text())
 .then(data => {
 
 const filas = data.trim().split("\n");
-filas.shift(); // quitar encabezado
+filas.shift();
 
-filas.forEach((fila, index) => {
+const marcasUnicas = new Set();
+
+filas.forEach((fila,index)=>{
 
 const columnas = fila.split(",");
-
 if(columnas.length < 6) return;
 
-const nombre = columnas[0];
-const marca = columnas[1];
-const precioUnidad = parseFloat(columnas[2]);
-const precioMayor = parseFloat(columnas[3]);
-const minMayor = parseInt(columnas[4]);
-const imagen = columnas[5];
+const producto = {
+nombre: columnas[0],
+marca: columnas[1],
+precioUnidad: parseFloat(columnas[2]),
+precioMayor: parseFloat(columnas[3]),
+minMayor: parseInt(columnas[4]),
+imagen: columnas[5],
+id: index
+};
 
-const idCantidad = "cantidad_" + index;
+productosData.push(producto);
+marcasUnicas.add(producto.marca);
+
+});
+
+cargarMarcas(marcasUnicas);
+mostrarProductos(productosData);
+
+});
+
+function cargarMarcas(marcas){
+const select = document.getElementById("filtroMarca");
+marcas.forEach(marca=>{
+const option = document.createElement("option");
+option.value = marca;
+option.textContent = marca;
+select.appendChild(option);
+});
+}
+
+function mostrarProductos(lista){
+
+const contenedor = document.getElementById("productos");
+contenedor.innerHTML = "";
+
+lista.forEach(producto=>{
+
+const idCantidad = "cantidad_"+producto.id;
 
 const card = document.createElement("div");
-card.className = "card";
+card.className="card";
 
 card.innerHTML = `
-<img src="${imagen}" alt="">
-<h3>${nombre}</h3>
-<p><b>Marca:</b> ${marca}</p>
-<p>Unidad: S/ ${precioUnidad}</p>
-<p>Mayor desde ${minMayor}: S/ ${precioMayor}</p>
+<img src="${producto.imagen}">
+<h3>${producto.nombre}</h3>
+<p><b>Marca:</b> ${producto.marca}</p>
+<p>Unidad: S/ ${producto.precioUnidad}</p>
+<p>Mayor desde ${producto.minMayor}: S/ ${producto.precioMayor}</p>
 <input type="number" min="0" value="0" id="${idCantidad}">
-<button onclick="agregarProducto('${idCantidad}','${nombre}',${precioUnidad},${precioMayor},${minMayor})">
+<button onclick="agregarProducto('${idCantidad}','${producto.nombre}',${producto.precioUnidad},${producto.precioMayor},${producto.minMayor})">
 Agregar
 </button>
 `;
 
-document.getElementById("productos").appendChild(card);
+contenedor.appendChild(card);
 
 });
 
+}
+
+function filtrar(){
+
+const texto = document.getElementById("buscador").value.toLowerCase();
+const marcaSeleccionada = document.getElementById("filtroMarca").value;
+
+const filtrados = productosData.filter(p=>{
+
+const coincideNombre = p.nombre.toLowerCase().includes(texto);
+const coincideMarca = marcaSeleccionada === "" || p.marca === marcaSeleccionada;
+
+return coincideNombre && coincideMarca;
+
 });
+
+mostrarProductos(filtrados);
+}
 
 function agregarProducto(id,nombre,precioU,precioM,minM){
 
 const cantidad = parseInt(document.getElementById(id).value);
-
-if(!cantidad || cantidad <= 0){
-alert("Ingresa una cantidad válida");
-return;
-}
+if(!cantidad || cantidad<=0) return;
 
 let precioFinal = cantidad >= minM ? precioM : precioU;
 let subtotal = cantidad * precioFinal;
 
-carrito[nombre] = {
-cantidad: cantidad,
-subtotal: subtotal
-};
+carrito[nombre] = {cantidad, subtotal};
 
 calcularTotal();
 }
 
 function calcularTotal(){
-
 total = 0;
-
-for(let producto in carrito){
-total += carrito[producto].subtotal;
+for(let item in carrito){
+total += carrito[item].subtotal;
 }
-
 document.getElementById("total").innerText = total.toFixed(2);
 }
 
 function enviarPedido(){
 
-if(Object.keys(carrito).length === 0){
+if(Object.keys(carrito).length===0){
 alert("No hay productos en el pedido");
 return;
 }
 
-let mensaje = "Hola, quiero pedir:%0A";
+let mensaje="Hola, quiero pedir:%0A";
 
-for(let producto in carrito){
-mensaje += `- ${producto} x${carrito[producto].cantidad} = S/ ${carrito[producto].subtotal}%0A`;
+for(let item in carrito){
+mensaje += `- ${item} x${carrito[item].cantidad} = S/ ${carrito[item].subtotal}%0A`;
 }
 
 mensaje += `%0ATotal: S/ ${total.toFixed(2)}`;
@@ -185,3 +236,4 @@ window.open(`https://wa.me/${whatsapp}?text=${mensaje}`);
 
 </body>
 </html>
+
