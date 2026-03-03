@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Tienda Online</title>
+<title>Mi Tienda</title>
 
 <style>
 body{
@@ -14,6 +14,7 @@ padding:20px;
 
 h1{
 text-align:center;
+margin-bottom:30px;
 }
 
 .productos{
@@ -37,6 +38,12 @@ object-fit:cover;
 border-radius:8px;
 }
 
+input{
+width:60px;
+text-align:center;
+margin-top:5px;
+}
+
 button{
 background:#25D366;
 color:white;
@@ -52,26 +59,23 @@ button:hover{
 background:#1ebe5d;
 }
 
-input{
-width:60px;
-text-align:center;
-}
-
 .total{
-margin-top:20px;
-font-size:18px;
+margin-top:30px;
+font-size:20px;
 text-align:right;
+font-weight:bold;
 }
 </style>
 </head>
+
 <body>
 
-<h1>Mi Tienda</h1>
+<h1>Mi Tienda Online</h1>
 
 <div id="productos" class="productos"></div>
 
 <div class="total">
-Total: S/ <span id="total">0</span>
+Total: S/ <span id="total">0.00</span>
 <br><br>
 <button onclick="enviarPedido()">Enviar Pedido por WhatsApp</button>
 </div>
@@ -82,16 +86,17 @@ const whatsapp = "51992044102";
 
 const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8uMFvOEq09EXVbg6YxPa1lhGndcrwD-ELRkxRQVsiG4Tjb646vPzGPcuHP4CD_EZ-F7da5BonXwt3/pub?output=csv";
 
-let carrito = [];
+let carrito = {};
 let total = 0;
 
 fetch(csvURL)
 .then(response => response.text())
 .then(data => {
 
-const filas = data.trim().split("\n").slice(1);
+const filas = data.trim().split("\n");
+filas.shift(); // quitar encabezado
 
-filas.forEach(fila => {
+filas.forEach((fila, index) => {
 
 const columnas = fila.split(",");
 
@@ -104,56 +109,72 @@ const precioMayor = parseFloat(columnas[3]);
 const minMayor = parseInt(columnas[4]);
 const imagen = columnas[5];
 
-const contenedor = document.getElementById("productos");
+const idCantidad = "cantidad_" + index;
 
 const card = document.createElement("div");
-card.className="card";
+card.className = "card";
 
 card.innerHTML = `
 <img src="${imagen}" alt="">
 <h3>${nombre}</h3>
 <p><b>Marca:</b> ${marca}</p>
 <p>Unidad: S/ ${precioUnidad}</p>
-<p>Mayor (desde ${minMayor}): S/ ${precioMayor}</p>
-<input type="number" min="0" value="0" id="cant-${nombre}">
-<button onclick="agregar('${nombre}',${precioUnidad},${precioMayor},${minMayor})">
+<p>Mayor desde ${minMayor}: S/ ${precioMayor}</p>
+<input type="number" min="0" value="0" id="${idCantidad}">
+<button onclick="agregarProducto('${idCantidad}','${nombre}',${precioUnidad},${precioMayor},${minMayor})">
 Agregar
 </button>
 `;
 
-contenedor.appendChild(card);
+document.getElementById("productos").appendChild(card);
 
 });
 
 });
 
-function agregar(nombre,precioU,precioM,minM){
+function agregarProducto(id,nombre,precioU,precioM,minM){
 
-const cantidad = parseInt(document.getElementById("cant-"+nombre).value);
+const cantidad = parseInt(document.getElementById(id).value);
 
-if(!cantidad || cantidad<=0) return;
+if(!cantidad || cantidad <= 0){
+alert("Ingresa una cantidad válida");
+return;
+}
 
 let precioFinal = cantidad >= minM ? precioM : precioU;
 let subtotal = cantidad * precioFinal;
 
-carrito.push({nombre,cantidad,subtotal});
-total += subtotal;
+carrito[nombre] = {
+cantidad: cantidad,
+subtotal: subtotal
+};
+
+calcularTotal();
+}
+
+function calcularTotal(){
+
+total = 0;
+
+for(let producto in carrito){
+total += carrito[producto].subtotal;
+}
 
 document.getElementById("total").innerText = total.toFixed(2);
 }
 
 function enviarPedido(){
 
-if(carrito.length===0){
+if(Object.keys(carrito).length === 0){
 alert("No hay productos en el pedido");
 return;
 }
 
-let mensaje="Hola, quiero pedir:%0A";
+let mensaje = "Hola, quiero pedir:%0A";
 
-carrito.forEach(p=>{
-mensaje += `- ${p.nombre} x${p.cantidad} = S/ ${p.subtotal}%0A`;
-});
+for(let producto in carrito){
+mensaje += `- ${producto} x${carrito[producto].cantidad} = S/ ${carrito[producto].subtotal}%0A`;
+}
 
 mensaje += `%0ATotal: S/ ${total.toFixed(2)}`;
 
