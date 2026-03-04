@@ -280,7 +280,7 @@ border-radius:50%;
 
 <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">
 <input type="text" id="clienteNombre" placeholder="Tu nombre *" required>
-<input type="email" id="clienteCorreo" placeholder="Tu correo *" required>
+
 </div>
 
 <div class="botones-carrito">
@@ -453,9 +453,9 @@ function enviarWhatsApp(){
 
 let nombre=document.getElementById("clienteNombre").value.trim();
 
-if(nombre==="" || telefono===""){
-alert("Por favor completa tu nombre, antes de enviar el pedido.");
-return;
+if(nombre === ""){
+  alert("Por favor completa tu nombre antes de enviar el pedido.");
+  return;
 }
 
 let mensaje="🛍️ NUEVO PEDIDO SOPHIE STORE%0A%0A";
@@ -489,6 +489,7 @@ document.getElementById("carrito").classList.remove("activo");
 
 </body>
 </html>
+
 
 
 
