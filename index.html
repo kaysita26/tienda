@@ -451,31 +451,37 @@ input.value = carrito[codigo]?carrito[codigo].cantidad:0;
 
 function enviarWhatsApp(){
 
-let nombre=document.getElementById("clienteNombre").value.trim();
+let nombre = document.getElementById("clienteNombre").value.trim();
 
 if(nombre === ""){
   alert("Por favor completa tu nombre antes de enviar el pedido.");
   return;
 }
 
-let mensaje="🛍️ NUEVO PEDIDO SOPHIE STORE%0A%0A";
-mensaje+="👤 Cliente: "+nombre+"%0A";
-mensaje+="📦 Productos:%0A";
+let mensaje = "🛍️ NUEVO PEDIDO SOPHIE STORE\n\n";
+mensaje += "👤 Cliente: " + nombre + "\n\n";
+mensaje += "📦 Productos:\n";
 
-let total=0;
+let total = 0;
 
-Object.values(carrito).forEach(p=>{
-let precioBase=precioConDescuento(p);
-let precioFinal=p.cantidad>=p.min_mayor?p.precio_mayor:precioBase;
-let subtotal=precioFinal*p.cantidad;
-total+=subtotal;
+Object.values(carrito).forEach(p => {
 
-mensaje+=`${p.nombre} (Cod:${p.codigo}) x ${p.cantidad} - S/ ${subtotal.toFixed(2)}%0A`;
+let precioBase = precioConDescuento(p);
+let precioFinal = p.cantidad >= p.min_mayor ? p.precio_mayor : precioBase;
+let subtotal = precioFinal * p.cantidad;
+
+total += subtotal;
+
+mensaje += `${p.nombre} (Cod:${p.codigo}) x ${p.cantidad} - S/ ${subtotal.toFixed(2)}\n`;
+
 });
 
-mensaje+=`%0A💰 TOTAL: S/ ${total.toFixed(2)}`;
+mensaje += `\n💰 TOTAL: S/ ${total.toFixed(2)}`;
 
-window.open("https://wa.me/51992044102?text="+mensaje);
+// 🔥 Abrir WhatsApp SOLO UNA VEZ y al final
+let url = "https://wa.me/51992044102?text=" + encodeURIComponent(mensaje);
+window.open(url, "_blank");
+
 }
 
 function abrirCarrito(){
@@ -489,6 +495,7 @@ document.getElementById("carrito").classList.remove("activo");
 
 </body>
 </html>
+
 
 
 
