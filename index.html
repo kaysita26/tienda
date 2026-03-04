@@ -482,24 +482,6 @@ mensaje += `${p.nombre} (Cod:${p.codigo}) x ${p.cantidad} - S/ ${subtotal.toFixe
 });
 
 mensaje += `\n💰 TOTAL: S/ ${total.toFixed(2)}`;
-fetch("https://script.google.com/macros/s/AKfycbxRv9ZfLfp5g25hBuIATzel5IwKqkgKAANbsJLMY1-HxImtWNXECpXmhVqu1E_JRlnabw/exec", {
-  method: "POST",
-  body: JSON.stringify({
-    cliente: nombre,
-    total: total,
-    productos: Object.values(carrito).map(p => {
-      let precioBase = precioConDescuento(p);
-      let precioFinal = p.cantidad >= p.min_mayor ? p.precio_mayor : precioBase;
-      return {
-        codigo: p.codigo,
-        nombre: p.nombre,
-        cantidad: p.cantidad,
-        precio: precioFinal,
-        subtotal: precioFinal * p.cantidad
-      };
-    })
-  })
-});
 // 🔥 Abrir WhatsApp SOLO UNA VEZ y al final
 let url = "https://wa.me/51992044102?text=" + encodeURIComponent(mensaje);
 window.open(url, "_blank");
@@ -526,6 +508,7 @@ document.getElementById("carrito").classList.remove("activo");
 
 </body>
 </html>
+
 
 
 
