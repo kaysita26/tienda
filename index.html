@@ -25,12 +25,6 @@ top:0;
 z-index:100;
 }
 
-.logo-box{
-display:flex;
-align-items:center;
-gap:15px;
-}
-
 header img{
 height:65px;
 }
@@ -104,14 +98,16 @@ margin:5px 0;
 
 .precio-original{
 text-decoration:line-through;
-color:#888;
-font-size:14px;
+color:red;
+font-size:15px;
+font-weight:bold;
 }
 
 .precio-final{
 color:#2e7d32;
 font-weight:bold;
 font-size:18px;
+margin-top:3px;
 }
 
 .precio-mayor{
@@ -180,10 +176,6 @@ border-bottom:1px solid #ddd;
 padding:10px 0;
 }
 
-.item-info{
-flex:1;
-}
-
 .item-control{
 display:flex;
 align-items:center;
@@ -245,6 +237,7 @@ justify-content:center;
 align-items:center;
 cursor:pointer;
 font-size:22px;
+position:fixed;
 }
 
 .burbuja{
@@ -262,9 +255,7 @@ border-radius:50%;
 <body>
 
 <header>
-<div class="logo-box">
 <img src="LOGO.png">
-</div>
 <div class="titulo">SOPHIE STORE</div>
 <div style="width:65px;"></div>
 </header>
@@ -293,36 +284,52 @@ border-radius:50%;
 
 <script>
 const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8uMFvOEq09EXVbg6YxPa1lhGndcrwD-ELRkxRQVsiG4Tjb646vPzGPcuHP4CD_EZ-F7da5BonXwt3/pub?gid=1913233787&single=true&output=csv";
+
 let carrito={};
 let productos=[];
+
+/* ===== PARSER CSV CORREGIDO PARA +300 PRODUCTOS ===== */
+function parseCSV(text){
+const rows=text.trim().split("\n");
+const headers=rows.shift().split(",");
+return rows.map(row=>{
+const values=row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+let obj={};
+headers.forEach((h,i)=>{
+obj[h.trim()]=values[i]?.replace(/"/g,"")||"";
+});
+return obj;
+});
+}
 
 fetch(URL)
 .then(r=>r.text())
 .then(data=>{
-const filas=data.split("\n").slice(1);
-productos=filas.map(f=>{
-const c=f.split(",");
-return{
-codigo:c[0],
-nombre:c[1],
-marca:c[2],
-categoria:c[3],
-precio:parseFloat(c[4]),
-precio_mayor:parseFloat(c[5]),
-min_mayor:parseInt(c[6]),
-descuento:parseFloat(c[7]),
-imagen:c[8]
-}
-});
+productos=parseCSV(data).map(p=>({
+codigo:p.Codigo,
+nombre:p.Nombre,
+marca:p.Marca,
+categoria:p.Categoria,
+precio:parseFloat(p.PrecioUnidad)||0,
+precio_mayor:parseFloat(p.PrecioMayor)||0,
+min_mayor:parseInt(p.MinMayor)||0,
+descuento:parseFloat(p.Descuento)||0,
+imagen:p.Imagen
+}));
 mostrarProductos(productos);
 cargarCategorias();
 });
 
+function precioConDescuento(p){
+return p.descuento>0 ? p.precio - (p.precio*p.descuento/100) : p.precio;
+}
+
 function mostrarProductos(lista){
 const cont=document.getElementById("productos");
 cont.innerHTML="";
+
 lista.forEach(p=>{
-let precioBase=p.descuento>0?p.precio-(p.precio*p.descuento/100):p.precio;
+let precioBase=precioConDescuento(p);
 
 cont.innerHTML+=`
 <div class="card">
@@ -335,18 +342,27 @@ ${p.descuento>0?`<div class="precio-original">S/ ${p.precio.toFixed(2)}</div>`:"
 <div class="precio-mayor">Mayor desde ${p.min_mayor}: S/ ${p.precio_mayor.toFixed(2)}</div>
 <div class="contador">
 <button onclick="cambiar('${p.codigo}',-1)">-</button>
-<span>${carrito[p.codigo]?carrito[p.codigo].cantidad:0}</span>
+<span>${carrito[p.codigo]?.cantidad||0}</span>
 <button onclick="cambiar('${p.codigo}',1)">+</button>
 </div>
 </div>`;
 });
 }
 
-function cambiar(codigo,v){
-let p=productos.find(x=>x.codigo===codigo);
-if(!carrito[codigo]) carrito[codigo]={...p,cantidad:0};
-carrito[codigo].cantidad+=v;
-if(carrito[codigo].cantidad<=0) delete carrito[codigo];
+function cambiar(codigo,valor){
+const producto=productos.find(p=>p.codigo===codigo);
+if(!producto) return;
+
+if(!carrito[codigo]){
+carrito[codigo]={...producto,cantidad:0};
+}
+
+carrito[codigo].cantidad+=valor;
+
+if(carrito[codigo].cantidad<=0){
+delete carrito[codigo];
+}
+
 actualizarCarrito();
 mostrarProductos(productos);
 }
@@ -358,16 +374,18 @@ let total=0;
 let contador=0;
 
 Object.values(carrito).forEach(p=>{
-let precioBase=p.descuento>0?p.precio-(p.precio*p.descuento/100):p.precio;
+let precioBase=precioConDescuento(p);
 let precioFinal=p.cantidad>=p.min_mayor?p.precio_mayor:precioBase;
 let subtotal=precioFinal*p.cantidad;
+
 total+=subtotal;
 contador+=p.cantidad;
 
 lista.innerHTML+=`
 <div class="item">
-<div class="item-info">
+<div>
 <strong>${p.nombre}</strong><br>
+${p.descuento>0?`<span style="color:red;">Con ${p.descuento}% descuento</span><br>`:""}
 Subtotal: S/ ${subtotal.toFixed(2)}
 </div>
 <div class="item-control">
@@ -388,7 +406,7 @@ let mensaje="Pedido:%0A";
 let total=0;
 
 Object.values(carrito).forEach(p=>{
-let precioBase=p.descuento>0?p.precio-(p.precio*p.descuento/100):p.precio;
+let precioBase=precioConDescuento(p);
 let precioFinal=p.cantidad>=p.min_mayor?p.precio_mayor:precioBase;
 let subtotal=precioFinal*p.cantidad;
 total+=subtotal;
