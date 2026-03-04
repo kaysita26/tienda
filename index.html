@@ -2,38 +2,27 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-
-<!-- Permite que se adapte a celular -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>SOPHIE STORE</title>
 
 <style>
-
-/* ================================
-   ESTILOS GENERALES
-================================ */
-
 body{
 margin:0;
 font-family:'Segoe UI',sans-serif;
 background:#f4f6f9;
 }
 
-/* ================================
-   HEADER SUPERIOR
-================================ */
-
+/* HEADER */
 header{
 background:white;
 padding:15px 30px;
 display:flex;
 align-items:center;
 justify-content:space-between;
+box-shadow:0 2px 10px rgba(0,0,0,0.08);
 position:sticky;
 top:0;
 z-index:100;
-box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
 
 header img{ height:65px; }
@@ -45,10 +34,7 @@ font-size:28px;
 font-weight:bold;
 }
 
-/* ================================
-   CONTROLES (BUSCADOR + FILTRO)
-================================ */
-
+/* CONTROLES */
 .controls{
 display:flex;
 flex-wrap:wrap;
@@ -66,10 +52,7 @@ font-size:14px;
 min-width:180px;
 }
 
-/* ================================
-   GRID PRODUCTOS
-================================ */
-
+/* GRID */
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
@@ -78,10 +61,6 @@ padding:20px;
 max-width:1300px;
 margin:auto;
 }
-
-/* ================================
-   CARD PRODUCTO
-================================ */
 
 .card{
 background:white;
@@ -137,10 +116,6 @@ padding:4px 7px;
 border-radius:6px;
 }
 
-/* ================================
-   CONTADOR + Y -
-================================ */
-
 .contador{
 display:flex;
 align-items:center;
@@ -166,10 +141,7 @@ border:1px solid #ccc;
 padding:5px;
 }
 
-/* ================================
-   CARRITO LATERAL
-================================ */
-
+/* CARRITO */
 .carrito{
 position:fixed;
 right:-100%;
@@ -271,20 +243,16 @@ font-size:12px;
 padding:4px 7px;
 border-radius:50%;
 }
-
 </style>
 </head>
-
 <body>
 
-<!-- ================= HEADER ================= -->
 <header>
 <img src="https://github.com/kaysita26/tienda/raw/main/imagenes/LOGO%20SOPHIE%20STORE.jpeg">
 <div class="titulo">SOPHIE STORE</div>
 <div style="width:65px;"></div>
 </header>
 
-<!-- ================= BUSCADOR Y FILTRO ================= -->
 <div class="controls">
 <input type="text" id="buscar" placeholder="Buscar producto...">
 <select id="filtroCategoria">
@@ -292,16 +260,13 @@ border-radius:50%;
 </select>
 </div>
 
-<!-- ================= PRODUCTOS ================= -->
 <div class="grid" id="productos"></div>
 
-<!-- ================= BOTÓN FLOTANTE CARRITO ================= -->
 <div class="carrito-btn" onclick="abrirCarrito()">
 🛒
 <div class="burbuja" id="contadorCarrito">0</div>
 </div>
 
-<!-- ================= CARRITO ================= -->
 <div class="carrito" id="carrito">
 <h2 style="text-align:center;margin:20px 0;">Tu Carrito</h2>
 
@@ -310,7 +275,6 @@ border-radius:50%;
 <div class="footer-carrito">
 <div class="total" id="totalCarrito">Total: S/ 0.00</div>
 
-<!-- DATOS OBLIGATORIOS -->
 <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">
 <input type="text" id="clienteNombre" placeholder="Tu nombre *" required>
 <input type="email" id="clienteCorreo" placeholder="Tu correo *" required>
@@ -324,24 +288,13 @@ border-radius:50%;
 </div>
 
 <script>
-
-/* =====================================
-   CONFIGURACIÓN GOOGLE SHEETS
-===================================== */
-
-const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8uMFvOEq09EXVbg6YxPa1lhGndcrwD-ELRkxRQVsiG4Tjb646vPzGPcuHP4CD_EZ-F7da5BonXwt3/pub?gid=1913233787&single=true&output=csv"; // ← pega tu link CSV
-
-let carrito={}; // Guarda productos agregados
-let productos=[]; // Lista completa
-
-/* =====================================
-   CARGA DE PRODUCTOS DESDE SHEETS
-===================================== */
+const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8uMFvOEq09EXVbg6YxPa1lhGndcrwD-ELRkxRQVsiG4Tjb646vPzGPcuHP4CD_EZ-F7da5BonXwt3/pub?gid=1913233787&single=true&output=csv";
+let carrito={};
+let productos=[];
 
 fetch(URL)
 .then(r=>r.text())
 .then(data=>{
-
 const filas=data.split("\n").slice(1);
 
 productos=filas.map(f=>{
@@ -361,17 +314,186 @@ imagen:c[8]
 
 cargarCategorias();
 mostrarProductos(productos);
-
 });
 
-/* =====================================
-   RESTO DEL JS (FUNCIONES)
-===================================== */
+function cargarCategorias(){
+const categorias=[...new Set(productos.map(p=>p.categoria))];
+const select=document.getElementById("filtroCategoria");
+categorias.forEach(cat=>{
+if(cat){
+let op=document.createElement("option");
+op.value=cat;
+op.textContent=cat;
+select.appendChild(op);
+}
+});
+}
 
-// (Todo tu JS original sigue aquí igual,
-// no lo modifico porque ya está correcto)
+document.getElementById("buscar").addEventListener("input",filtrar);
+document.getElementById("filtroCategoria").addEventListener("change",filtrar);
 
+function filtrar(){
+const texto=document.getElementById("buscar").value.toLowerCase();
+const categoria=document.getElementById("filtroCategoria").value;
+
+const filtrados=productos.filter(p=>{
+return(
+(p.nombre.toLowerCase().includes(texto)||
+p.codigo.toLowerCase().includes(texto)||
+p.marca.toLowerCase().includes(texto))
+&&
+(categoria===""||p.categoria===categoria)
+);
+});
+
+mostrarProductos(filtrados);
+}
+
+function precioConDescuento(p){
+return p.descuento>0?p.precio-(p.precio*p.descuento/100):p.precio;
+}
+
+function mostrarProductos(lista){
+const cont=document.getElementById("productos");
+cont.innerHTML="";
+
+lista.forEach(p=>{
+let precioBase=precioConDescuento(p);
+
+cont.innerHTML+=`
+<div class="card">
+${p.descuento>0?`<div class="descuento">-${p.descuento}%</div>`:""}
+<img src="${p.imagen}">
+<div class="codigo">Código: ${p.codigo}</div>
+<div class="nombre">${p.nombre}</div>
+${p.descuento>0?`<div class="precio-original">S/ ${p.precio.toFixed(2)}</div>`:""}
+<div class="precio-final">Unidad: S/ ${precioBase.toFixed(2)}</div>
+<div class="precio-mayor">Mayor desde ${p.min_mayor}: S/ ${p.precio_mayor.toFixed(2)}</div>
+
+<div class="contador">
+<button onclick="cambiar('${p.codigo}',-1)">-</button>
+<input type="number" min="0" value="${carrito[p.codigo]?carrito[p.codigo].cantidad:0}" onchange="manual('${p.codigo}',this.value)">
+<button onclick="cambiar('${p.codigo}',1)">+</button>
+</div>
+</div>
+`;
+});
+}
+
+function manual(codigo,valor){
+let p=productos.find(x=>x.codigo===codigo);
+let cantidad=parseInt(valor)||0;
+
+if(cantidad<=0){
+delete carrito[codigo];
+}else{
+carrito[codigo]={...p,cantidad:cantidad};
+}
+actualizarCarrito();
+}
+
+function cambiar(codigo,v){
+let p=productos.find(x=>x.codigo===codigo);
+if(!carrito[codigo]){
+carrito[codigo]={...p,cantidad:0};
+}
+carrito[codigo].cantidad+=v;
+if(carrito[codigo].cantidad<=0){
+delete carrito[codigo];
+}
+actualizarCarrito();
+}
+
+function actualizarCarrito(){
+const lista=document.getElementById("listaCarrito");
+lista.innerHTML="";
+let total=0;
+let contador=0;
+
+Object.values(carrito).forEach(p=>{
+let precioBase=precioConDescuento(p);
+let precioFinal=p.cantidad>=p.min_mayor?p.precio_mayor:precioBase;
+let subtotal=precioFinal*p.cantidad;
+total+=subtotal;
+contador+=p.cantidad;
+
+lista.innerHTML+=`
+<div class="item">
+<div>
+<strong>${p.nombre}</strong><br>
+Subtotal: S/ ${subtotal.toFixed(2)}
+</div>
+<div class="item-control">
+<button onclick="cambiar('${p.codigo}',-1)">-</button>
+<span>${p.cantidad}</span>
+<button onclick="cambiar('${p.codigo}',1)">+</button>
+</div>
+</div>
+`;
+});
+
+document.getElementById("totalCarrito").innerText="Total: S/ "+total.toFixed(2);
+document.getElementById("contadorCarrito").innerText=contador;
+document.getElementById("btnEnviar").disabled=total<=0;
+
+actualizarInputs();
+}
+
+function actualizarInputs(){
+document.querySelectorAll(".contador input").forEach(input=>{
+let codigo=input.getAttribute("onchange").match(/'(.*?)'/)[1];
+input.value = carrito[codigo]?carrito[codigo].cantidad:0;
+});
+}
+
+function enviarWhatsApp(){
+
+let nombre=document.getElementById("clienteNombre").value.trim();
+let correo=document.getElementById("clienteCorreo").value.trim();
+
+if(nombre==="" || correo===""){
+alert("Por favor completa tu nombre y correo antes de enviar el pedido.");
+return;
+}
+
+let emailValido=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if(!emailValido.test(correo)){
+alert("Ingresa un correo válido.");
+return;
+}
+
+let mensaje="🛍️ NUEVO PEDIDO SOPHIE STORE%0A%0A";
+mensaje+="👤 Cliente: "+nombre+"%0A";
+mensaje+="📧 Correo: "+correo+"%0A%0A";
+mensaje+="📦 Productos:%0A";
+
+let total=0;
+
+Object.values(carrito).forEach(p=>{
+let precioBase=precioConDescuento(p);
+let precioFinal=p.cantidad>=p.min_mayor?p.precio_mayor:precioBase;
+let subtotal=precioFinal*p.cantidad;
+total+=subtotal;
+
+mensaje+=`${p.nombre} (Cod:${p.codigo}) x ${p.cantidad} - S/ ${subtotal.toFixed(2)}%0A`;
+});
+
+mensaje+=`%0A💰 TOTAL: S/ ${total.toFixed(2)}`;
+
+window.open("https://wa.me/51992044102?text="+mensaje);
+}
+
+function abrirCarrito(){
+document.getElementById("carrito").classList.add("activo");
+}
+
+function cerrarCarrito(){
+document.getElementById("carrito").classList.remove("activo");
+}
 </script>
 
 </body>
 </html>
+
+
